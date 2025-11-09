@@ -46,6 +46,16 @@ jobs:
           config: video=true,screenshotOnRunFailure=true
         env:
           CYPRESS_baseUrl: https://automationexercise.com
+      
+      - name: Merge Mochawesome Reports
+        if: always()
+        run: npm run cy:report:merge
+        continue-on-error: true
+        
+      - name: Generate HTML Report
+        if: always()
+        run: npm run cy:report:generate
+        continue-on-error: true
           
       - name: Upload Screenshots (on failure)
         uses: actions/upload-artifact@v4
@@ -63,14 +73,20 @@ jobs:
           path: cypress/videos
           retention-days: 7
           
-      - name: Upload Test Results
+      - name: Upload HTML Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results-${{ matrix.browser }}
-          path: |
-            cypress/results
-            cypress/reports
+          name: mochawesome-report-${{ matrix.browser }}
+          path: cypress/reports/html
+          retention-days: 30
+          
+      - name: Upload JSON Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-json-${{ matrix.browser }}
+          path: cypress/reports/json
           retention-days: 30
 
  
@@ -105,9 +121,15 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
           echo "Check the artifacts section below for:" >> $GITHUB_STEP_SUMMARY
-          echo "- 📹 Test execution videos" >> $GITHUB_STEP_SUMMARY
+          echo "- � **Mochawesome HTML Reports** (interactive reports per browser)" >> $GITHUB_STEP_SUMMARY
+          echo "- �📹 Test execution videos" >> $GITHUB_STEP_SUMMARY
           echo "- 📸 Failure screenshots" >> $GITHUB_STEP_SUMMARY
-          echo "- 📄 Test results" >> $GITHUB_STEP_SUMMARY
+          echo "- 📄 JSON test results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 How to View Reports" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download the \`mochawesome-report-{browser}\` artifact" >> $GITHUB_STEP_SUMMARY
+          echo "2. Extract the ZIP file" >> $GITHUB_STEP_SUMMARY
+          echo "3. Open \`index.html\` in your browser" >> $GITHUB_STEP_SUMMARY
 
   notify:
     runs-on: ubuntu-22.04
