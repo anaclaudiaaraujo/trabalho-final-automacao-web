@@ -124,6 +124,7 @@ playwright/.cache/
 cypress/videos/
 cypress/screenshots/
 cypress/downloads/
+cypress/reports/
 
 # WebDriver downloads
 drivers/
