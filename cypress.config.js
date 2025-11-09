@@ -3,9 +3,6 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
-      // Mochawesome reporter configuration
-      require('cypress-mochawesome-reporter/plugin')(on);
-      return config;
     },
     baseUrl: 'https://automationexercise.com',
     viewportWidth: 1280,
@@ -20,9 +17,9 @@ module.exports = defineConfig({
     watchForFileChanges: false,
     
     // Mochawesome reporter settings
-    reporter: 'cypress-mochawesome-reporter',
+    reporter: 'mochawesome',
     reporterOptions: {
-      reportDir: 'cypress/reports/json',
+      reportDir: 'cypress/reports',
       overwrite: false,
       html: false,
       json: true,
