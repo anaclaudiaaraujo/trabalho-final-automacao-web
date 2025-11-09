@@ -1,0 +1,13 @@
+{
+  "searchTerms": {
+    "dress": "Dress",
+    "tshirt": "Tshirt",
+    "jeans": "Jeans",
+    "top": "Top"
+  },
+  "categories": [
+    "Women",
+    "Men",
+    "Kids"
+  ]
+}

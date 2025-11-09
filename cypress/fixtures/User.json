@@ -1,0 +1,18 @@
+{
+	"title": "Mrs",
+	"name": "Maria Joaquina",
+	"email": "maria.teste@test.com",
+	"password": "senh@123456",
+	"birthdayDay": 22,
+	"birthdayMonth": "June",
+	"birthdayYear": 1950,
+	"firstName": "Maria",
+	"lastName": "Joaquina",
+	"company": "ACME",
+	"address": "Rua dos Bobos, 0",
+	"country": "United States",
+	"state": "Kansas",
+	"city": "Kinsley",
+	"zipcode": 67547,
+	"mobileNumber": "+1 620 333 3333"
+}

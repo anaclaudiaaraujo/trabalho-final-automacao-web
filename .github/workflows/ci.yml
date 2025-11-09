@@ -1,0 +1,125 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches: main 
+  pull_request:
+    branches: main
+  workflow_dispatch:
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-22.04
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox, edge]
+        
+    name: E2E Tests - ${{ matrix.browser }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Cypress Info
+        run: npx cypress info
+        
+      - name: Verify Cypress
+        run: npx cypress verify
+        
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        with:
+          browser: ${{ matrix.browser }}
+          headed: false
+          record: false
+          config: video=true,screenshotOnRunFailure=true
+        env:
+          CYPRESS_baseUrl: https://automationexercise.com
+          
+      - name: Upload Screenshots (on failure)
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-${{ matrix.browser }}
+          path: cypress/screenshots
+          retention-days: 7
+          
+      - name: Upload Videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos-${{ matrix.browser }}
+          path: cypress/videos
+          retention-days: 7
+          
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.browser }}
+          path: |
+            cypress/results
+            cypress/reports
+          retention-days: 30
+
+ 
+  test-summary:
+    runs-on: ubuntu-22.04
+    needs: cypress-run
+    if: always()
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          
+      - name: Create Test Summary
+        run: |
+          echo "# 🧪 Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Execution Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Date:** $(date '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🌐 Browsers Tested" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Chrome" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Firefox" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Edge" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "Check the artifacts section below for:" >> $GITHUB_STEP_SUMMARY
+          echo "- 📹 Test execution videos" >> $GITHUB_STEP_SUMMARY
+          echo "- 📸 Failure screenshots" >> $GITHUB_STEP_SUMMARY
+          echo "- 📄 Test results" >> $GITHUB_STEP_SUMMARY
+
+  notify:
+    runs-on: ubuntu-22.04
+    needs: cypress-run
+    if: always()
+    
+    steps:
+      - name: Check Test Status
+        run: |
+          if [ "${{ needs.cypress-run.result }}" == "success" ]; then
+            echo "✅ All tests passed successfully!"
+          else
+            echo "❌ Some tests failed. Check the artifacts for details."
+            exit 1
+          fi
