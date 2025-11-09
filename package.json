@@ -1,0 +1,21 @@
+{
+  "name": "trabalho-final-automacao-web",
+  "version": "1.0.0",
+  "description": "Automation Exercise - Automated Web Testing Project",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "cypress run",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:chrome": "cypress run --browser chrome",
+    "cy:run:firefox": "cypress run --browser firefox",
+    "cy:run:headed": "cypress run --headed"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
+    "cypress": "^15.5.0"
+  }
+}
